@@ -2,24 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:simple_notes_app/component/edit_judul.dart';
 import 'package:simple_notes_app/pages/home.dart';
 import 'package:simple_notes_app/service/notes.dart';
-import 'package:intl/intl.dart';
 
-class AddNotes extends StatefulWidget {
-  const AddNotes({super.key});
+class EditNotes extends StatefulWidget {
+  final int id;
+  const EditNotes({super.key, required this.id});
 
   @override
-  State<AddNotes> createState() => _AddNotesState();
+  State<EditNotes> createState() => _EditNotesState();
 }
 
-class _AddNotesState extends State<AddNotes> {
+class _EditNotesState extends State<EditNotes> {
   final _isi = TextEditingController();
   final _judul = TextEditingController();
   bool isEdit = false;
   void saveBack() {
-    insertNotes(_isi.text, _judul.text);
+    updateNotes(_isi.text,widget.id, _judul.text);
     Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Home(title: "NotesApp",)));
+        MaterialPageRoute(
+            builder: (context) => const Home(
+                  title: "NotesApp",
+                )));
   }
 
   void setEdit() {
@@ -28,10 +31,18 @@ class _AddNotesState extends State<AddNotes> {
     });
   }
 
+  Future getNotes() async {
+    final note = await findNotes(widget.id);
+    
+    setState(() {
+      _isi.text= note['isi'];
+      _judul.text= note['judul'];
+    });
+  }
   @override
   void initState() {
     super.initState();
-    _judul.text = DateFormat('dd-MM-yyyy').format(DateTime.now()).toString();
+    getNotes();
   }
 
   @override
@@ -66,8 +77,7 @@ class _AddNotesState extends State<AddNotes> {
             child: const Icon(Icons.arrow_back),
           ),
         ),
-        body: 
-          Padding(
+        body: Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextFormField(
             controller: _isi,

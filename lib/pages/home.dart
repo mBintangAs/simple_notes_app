@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:simple_notes_app/component/notes_card.dart';
 import 'package:simple_notes_app/component/search.dart';
 import 'package:simple_notes_app/pages/add_notes.dart';
+import 'package:simple_notes_app/pages/edit_notes.dart';
 import 'package:simple_notes_app/service/database_helper.dart';
 import 'package:simple_notes_app/service/notes.dart';
 
@@ -59,10 +60,15 @@ class _HomeState extends State<Home> {
             flex: 1,
               child: ListView(
             children: _notes
-                .map((value) => NotesCard(
-                    judul: value['judul'],
-                    tanggal: parseDate(value['tanggal']),
-                    isi: value['isi']))
+                .map((value) => InkWell(
+                  onTap: () =>  Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) =>  EditNotes(id: value['id'])))
+              ,
+                  child: NotesCard(
+                      judul: value['judul'],
+                      tanggal: parseDate(value['tanggal']),
+                      isi: value['isi']),
+                ))
                 .toList(),
           )),
         ]),

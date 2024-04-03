@@ -5,15 +5,7 @@ import 'package:path/path.dart';
 
 void main() async {
   runApp(const MyApp());
-  // final database = openDatabase(
-  //   join(await getDatabasesPath(), 'my_db.db'),
-  //   onCreate:(db, version) {
-  //           print("versi :  $version");
-  //           return db.execute(
-  //             "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME);",
-  //           );
-  //         },
-  // );
+  
   final dbPath = await getDatabasesPath();
   final path = join(dbPath, 'my_db.db');
   final database = await openDatabase(
