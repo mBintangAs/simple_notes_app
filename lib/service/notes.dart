@@ -3,8 +3,7 @@ import 'package:sqflite/sqflite.dart';
 
 Future allNotes() async {
   var db = await openDatabase('my_db.db');
-  // var notes = await db.query("notes", orderBy: 'tanggal DESC', where: "is_deleted ='false'");
-  var notes = await db.rawQuery("SELECT isi,judul,tanggal FROM notes WHERE is_deleted = 'false'");
+  var notes = await db.rawQuery("SELECT id,isi,judul,tanggal FROM notes WHERE is_deleted = 'false'");
   return notes;
 }
 
@@ -26,6 +25,7 @@ Future deleteNotes(id) async {
   var db = await openDatabase('my_db.db');
   return await db.update("notes", {"is_deleted": "true"}, where: "id = $id");
 }
+
 
 Future undoDeleteNotes(id) async {
   var db = await openDatabase('my_db.db');

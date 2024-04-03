@@ -5,7 +5,7 @@ import 'package:path/path.dart';
 
 void main() async {
   runApp(const MyApp());
-  
+
   final dbPath = await getDatabasesPath();
   final path = join(dbPath, 'my_db.db');
   final database = await openDatabase(
@@ -13,14 +13,14 @@ void main() async {
     version: 1,
     onCreate: (db, version) async {
       return db.execute(
-        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME, is_deleted BOOLEAN DEFAULT false);",
+        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME, is_deleted TEXT DEFAULT 'false');",
       );
+      
     },
   );
   // print(await getDatabasesPath());
   // await databaseFactory.deleteDatabase(path);
   // await database.delete('notes');
-
   // await database.execute("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME, is_deleted BOOLEAN DEFAULT false);");
 }
 
