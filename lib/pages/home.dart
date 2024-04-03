@@ -44,6 +44,19 @@ class _HomeState extends State<Home> {
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
+  void searchNote(value) async {
+    if (value != null) {
+      final notes = await findNotesByQuery(value);
+      if (notes != null) {
+        setState(() {
+          _notes = notes;
+        });
+      }
+    } else {
+      _fetchData();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +79,8 @@ class _HomeState extends State<Home> {
                 fontSize: 32, fontFamily: "Arial", fontWeight: FontWeight.bold),
           ),
           const Divider(height: 30),
-          Search(onChanged: (value) => {print(value)}, placeholder: "Search"),
+          Search(
+              onChanged: (value) => {searchNote(value)}, placeholder: "Search"),
           Expanded(
               flex: 1,
               child: ListView(

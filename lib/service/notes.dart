@@ -3,21 +3,30 @@ import 'package:sqflite/sqflite.dart';
 
 Future allNotes() async {
   var db = await openDatabase('my_db.db');
-  var notes = await db.query("notes",
-      orderBy: 'tanggal DESC', where: "is_deleted = 'false'");
+  // var notes = await db.query("notes", orderBy: 'tanggal DESC', where: "is_deleted ='false'");
+  var notes = await db.rawQuery("SELECT isi,judul,tanggal FROM notes WHERE is_deleted = 'false'");
   return notes;
 }
 
-Future findNotes(int id) async {
+Future findNotesById(int id) async {
   var db = await openDatabase('my_db.db');
   var notes = await db.query("notes", where: "id = $id");
   return notes.first;
 }
 
+Future<List<Map<String, dynamic>>> findNotesByQuery(String search) async {
+  var db = await openDatabase('my_db.db');
+  var notes = await db.rawQuery(
+      "SELECT * FROM notes WHERE is_deleted = 'false' AND (judul LIKE '%$search%' OR isi LIKE '%$search%')");
+  return notes;
+}
+
+
 Future deleteNotes(id) async {
   var db = await openDatabase('my_db.db');
   return await db.update("notes", {"is_deleted": "true"}, where: "id = $id");
 }
+
 Future undoDeleteNotes(id) async {
   var db = await openDatabase('my_db.db');
   return await db.update("notes", {"is_deleted": "false"}, where: "id = $id");

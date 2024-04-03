@@ -32,7 +32,7 @@ class _EditNotesState extends State<EditNotes> {
   }
 
   Future getNotes() async {
-    final note = await findNotes(widget.id);
+    final note = await findNotesById(widget.id);
     
     setState(() {
       _isi.text= note['isi'];
