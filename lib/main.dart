@@ -13,14 +13,15 @@ void main() async {
     version: 1,
     onCreate: (db, version) async {
       return db.execute(
-        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME);",
+        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME, is_deleted BOOLEAN DEFAULT false);",
       );
     },
   );
-  // // print(await getDatabasesPath());
-
+  // print(await getDatabasesPath());
+  // await databaseFactory.deleteDatabase(path);
   // await database.delete('notes');
-  // await db.execute("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME);");
+
+  // await database.execute("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME, is_deleted BOOLEAN DEFAULT false);");
 }
 
 class MyApp extends StatelessWidget {

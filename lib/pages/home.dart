@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:simple_notes_app/component/notes_card.dart';
 import 'package:simple_notes_app/component/search.dart';
+import 'package:simple_notes_app/component/snack_bar_custom.dart';
+import 'package:simple_notes_app/component/swipe_detector.dart';
 import 'package:simple_notes_app/pages/add_notes.dart';
 import 'package:simple_notes_app/pages/edit_notes.dart';
-import 'package:simple_notes_app/service/database_helper.dart';
 import 'package:simple_notes_app/service/notes.dart';
 
 class Home extends StatefulWidget {
@@ -33,6 +34,16 @@ class _HomeState extends State<Home> {
     }
   }
 
+  void deleteNote(context, id) async {
+    await deleteNotes(id);
+    await _fetchData();
+    final snackbar = SnackBarCustom(onPress: () async {
+      await undoDeleteNotes(id);
+      await _fetchData();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,20 +68,31 @@ class _HomeState extends State<Home> {
           const Divider(height: 30),
           Search(onChanged: (value) => {print(value)}, placeholder: "Search"),
           Expanded(
-            flex: 1,
+              flex: 1,
               child: ListView(
-            children: _notes
-                .map((value) => InkWell(
-                  onTap: () =>  Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) =>  EditNotes(id: value['id'])))
-              ,
-                  child: NotesCard(
-                      judul: value['judul'],
-                      tanggal: parseDate(value['tanggal']),
-                      isi: value['isi']),
-                ))
-                .toList(),
-          )),
+                children: _notes
+                    .map((value) => InkWell(
+                          onTap: () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditNotes(id: value['id']))),
+                          child: SwipeDetector(
+                            key: UniqueKey(),
+                            onSwipeLeft: () {
+                              deleteNote(context, value['id']);
+                            },
+                            onSwipeRight: () {
+                              deleteNote(context, value['id']);
+                            },
+                            child: NotesCard(
+                                judul: value['judul'],
+                                tanggal: parseDate(value['tanggal']),
+                                isi: value['isi']),
+                          ),
+                        ))
+                    .toList(),
+              )),
         ]),
       ),
     );
