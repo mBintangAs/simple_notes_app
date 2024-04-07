@@ -7,6 +7,7 @@ Sebuah aplikasi sederhana untuk mencatat hal hal penting dalam kehidupan sehari-
 * Ubah catatan
 * Hapus catatan
 * Cari catatan
+* Kunci catatan
 
 # Teknologi Yang Digunakan
 * Flutter

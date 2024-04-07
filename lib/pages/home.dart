@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:simple_notes_app/component/enter_password.dart';
 import 'package:simple_notes_app/component/notes_card.dart';
+import 'package:simple_notes_app/component/notes_menu.dart';
 import 'package:simple_notes_app/component/search.dart';
 import 'package:simple_notes_app/component/snack_bar_custom.dart';
 import 'package:simple_notes_app/component/swipe_detector.dart';
 import 'package:simple_notes_app/pages/add_notes.dart';
 import 'package:simple_notes_app/pages/edit_notes.dart';
 import 'package:simple_notes_app/service/notes.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class Home extends StatefulWidget {
   final String title;
@@ -24,13 +27,26 @@ class _HomeState extends State<Home> {
 
   Future _fetchData() async {
     try {
-      final notes = await allNotes();
+      final notesData = await allNotes();
       setState(() {
-        _notes = notes;
+        _notes = notesData;
       });
     } catch (e) {
       // Handle error gracefully
       print('Error fetching data: $e');
+    }
+  }
+
+  void searchNote(value) async {
+    if (value != null) {
+      final notes = await findNotesByQuery(value);
+      if (notes.isNotEmpty) {
+        setState(() {
+          _notes = notes;
+        });
+      }
+    } else {
+      _fetchData();
     }
   }
 
@@ -42,19 +58,6 @@ class _HomeState extends State<Home> {
       await _fetchData();
     });
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
-
-  void searchNote(value) async {
-    if (value != null) {
-      final notes = await findNotesByQuery(value);
-      if (notes != null) {
-        setState(() {
-          _notes = notes;
-        });
-      }
-    } else {
-      _fetchData();
-    }
   }
 
   @override
@@ -86,11 +89,31 @@ class _HomeState extends State<Home> {
               child: ListView(
                 children: _notes
                     .map((value) => InkWell(
-                          onTap: () => Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditNotes(id: value['id']))),
+                          onLongPress: () {
+                            showMaterialModalBottomSheet(
+                                context: context,
+                                builder: (context) => NotesMenu(
+                                    delete: () =>
+                                        deleteNote(context, value['id']),
+                                    fetchData: _fetchData,
+                                    id: value['id'],
+                                    pin: value['pin']??"",
+                                    ),
+                                expand: false,
+                                enableDrag: true);
+                          },
+                          onTap: () {
+                            value['pin'] != null
+                                ? showDialog(
+                                    context: context,
+                                    builder: (context) => EnterPassword(id: value['id'],pin: value['pin']))
+                                : 
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditNotes(id: value['id'])));
+                          },
                           child: SwipeDetector(
                             key: UniqueKey(),
                             onSwipeLeft: () {
@@ -102,7 +125,8 @@ class _HomeState extends State<Home> {
                             child: NotesCard(
                                 judul: value['judul'],
                                 tanggal: parseDate(value['tanggal']),
-                                isi: value['isi']),
+                                isi: value['isi'],
+                                pin: value['pin'] ?? ""),
                           ),
                         ))
                     .toList(),

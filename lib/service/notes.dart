@@ -3,7 +3,8 @@ import 'package:sqflite/sqflite.dart';
 
 Future allNotes() async {
   var db = await openDatabase('my_db.db');
-  var notes = await db.rawQuery("SELECT id,isi,judul,tanggal FROM notes WHERE is_deleted = 'false'");
+  var notes = await db.rawQuery(
+      "SELECT * FROM notes WHERE is_deleted = 'false' AND is_hide ='false' ORDER BY tanggal DESC");
   return notes;
 }
 
@@ -20,12 +21,10 @@ Future<List<Map<String, dynamic>>> findNotesByQuery(String search) async {
   return notes;
 }
 
-
 Future deleteNotes(id) async {
   var db = await openDatabase('my_db.db');
   return await db.update("notes", {"is_deleted": "true"}, where: "id = $id");
 }
-
 
 Future undoDeleteNotes(id) async {
   var db = await openDatabase('my_db.db');
@@ -56,6 +55,21 @@ Future<void> updateNotes(isi, id, [judul]) async {
           'judul': judul ?? DateTime.now().toString(),
         },
         where: "id = $id");
+  }
+}
+
+Future<String> lockNotes(id, pin) async {
+  var db = await openDatabase('my_db.db');
+   var data = await db.query('notes', where: "id = ?", whereArgs: [id]);
+  if(data.first['pin']==null){
+      await db.update('notes', {"pin": pin}, where: "id = ?", whereArgs: [id]);
+      return "Password berhasil di tambahkan";
+  }
+  if (data.first['pin']==pin) {
+      await db.update('notes', {"pin": null}, where: "id = ?", whereArgs: [id]);
+      return "Password berhasil di hapus";
+  }else{
+      return "Password salah";
   }
 }
 

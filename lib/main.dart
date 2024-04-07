@@ -13,7 +13,7 @@ void main() async {
     version: 1,
     onCreate: (db, version) async {
       return db.execute(
-        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME, is_deleted TEXT DEFAULT 'false');",
+        "CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT,isi TEXT,judul TEXT,tanggal DATETIME, is_deleted TEXT DEFAULT 'false', is_hide TEXT DEFAULT 'false', pin TEXT );",
       );
       
     },
